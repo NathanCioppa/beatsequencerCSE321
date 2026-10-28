@@ -44,4 +44,6 @@ void setup() {
   Serial.println("START");
 }
 
-void loop() {}
+void loop() {
+  // Begs the question of "would you still love me if I was an empty loop?"
+}
