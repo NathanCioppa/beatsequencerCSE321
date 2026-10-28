@@ -18,9 +18,8 @@ void poll_inputs_task(void *pvParams) {
   uint8_t read = 0;
   uint8_t highedge = 0;
   for(;;) {
-    taskENTER_CRITICAL();
     read = READ_INPUTS;
-
+    taskENTER_CRITICAL();
     uint8_t *effected_tick = &sequence[seq_index];
     uint8_t effected_position = seq_position;
     taskEXIT_CRITICAL();

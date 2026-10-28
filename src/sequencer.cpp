@@ -8,8 +8,7 @@
 #define IS_HIGH_TICK(x) x & 1
 #define WRITE_TICK_OUT(tick) SEQ_OUT_PORT |= ((tick&0x0f)<<SEQ_OUT_PORT_LSB);
 #define CLEAR_TICK_OUT SEQ_OUT_PORT &= ~(0x0f<<SEQ_OUT_PORT_LSB);
-
-
+#define SEQUENCER_SET_POSITION_START seq_position = 0; seq_index = 0;
 
 // sequence fits in 64 bytes (128 ticks, 4 bits each)
 uint8_t sequence[64];
@@ -18,6 +17,8 @@ uint8_t sequence[64];
 uint8_t seq_position;
 // updated to be seq_position/2 when 
 uint8_t seq_index;
+
+TaskHandle_t tick_write_handle;
 
 // Inserts a tick into the sequence's current position.
 // Tick to insert is assumed to be contained in lower 4 bits of argument.
@@ -35,15 +36,6 @@ void sequence_insert(uint8_t tick, uint8_t *effected_tick, uint8_t effected_posi
     *effected_tick |= tick;
 }
 
-void sequence_restart() {
-    // Timer1 ISR regularly sets seq_position and seq_index
-    // Disabling it before reseting counters prevents data race
-    DISABLE_TIMER1_ISR
-    seq_position = 0;
-    seq_index = 0;
-    ENABLE_TIMER1_ISR
-}
-
 // periodically updates outputs with the sequence's current tick
 void tick_write_task(void *pvparameters) {
     for(;;) {
@@ -54,7 +46,7 @@ void tick_write_task(void *pvparameters) {
             tick = tick >> 4;
         WRITE_TICK_OUT(tick);
         taskEXIT_CRITICAL();
-        vTaskDelay(pdMS_TO_TICKS(10));
+        vTaskDelay(pdMS_TO_TICKS(TICK_WRITE_PERIOD_MS));
     }
 }
 

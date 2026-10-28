@@ -16,7 +16,6 @@ void setup() {
   DDRB |= (1<<PB1); // PortB Pin1 is the output for Timer1, must be in output mode. ATMega datasheet 14.3.1
   TCCR1A = (1<<COM1A0); // set to Toggle on Compare Match (toggle output pin on each counter reset). ATMega datasheet 16.11.1
   TCCR1B = (1<<WGM12)|(1<<CS11)|(1<<CS10); // set to CTC Mode, with prescalar 64. ATMega datasheet 16.11.2
-  TIMSK1 = (1<<OCIE1A); // set Timer1 to trigger an interrupt on Compare Match. ATMega datasheet 16.11.8
   OCR1A = BPM_TO_OCR1A(DEFAULT_BPM); // initialize clock to DEFAULT_BPM. 
   
 /*
@@ -37,11 +36,9 @@ void setup() {
   DDRB |= (1<<PB2)|(1<<PB3)|(1<<PB4); // set PortB pins 2-4 as output, for state tracking.
 
   xTaskCreate(poll_inputs_task, "poll", 100, NULL, 1, NULL);
-  xTaskCreate(tick_write_task, "tikw", 100, NULL, 1, NULL);
+  xTaskCreate(tick_write_task, "tikw", 100, NULL, 1, &tick_write_handle);
 
-  Serial.begin(9600);
-
-  Serial.println("START");
+  SEQUENCER_START // default to sequencer being on, since recording is default state
 }
 
 void loop() {
