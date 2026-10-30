@@ -51,13 +51,10 @@ void handle_inputs_recording(uint8_t inputs, uint8_t *effected_tick, uint8_t eff
 }
 
 void handle_inputs_load(uint8_t inputs) {
-
 }
 
 void handle_inputs_store(uint8_t inputs) {
-
 }
 
 void handle_inputs_tempo(uint8_t inputs) {
-
 }

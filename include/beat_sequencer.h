@@ -3,13 +3,6 @@
 
 #include "sequencer.h"
 
-#define STATE_RECORDING 0b00
-#define STATE_STORE 0b01
-#define STATE_LOAD 0b10
-#define STATE_TEMPO 0b11
-
-#define DEFAULT_STATE STATE_RECORDING
-
 #define CPU_CLK_HZ 16000000
 
 #define DEFAULT_BPM 30

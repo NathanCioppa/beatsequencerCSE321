@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <avr/interrupt.h>
 #include <Arduino_FreeRTOS.h>
+#include "state.h"
 
 #define SEQ_ON_HIGH_TICK seq_position & 1
 #define IS_HIGH_TICK(x) x & 1
@@ -39,6 +40,8 @@ void sequence_insert(uint8_t tick, uint8_t *effected_tick, uint8_t effected_posi
 // periodically updates outputs with the sequence's current tick
 void tick_write_task(void *pvparameters) {
     for(;;) {
+        if(state != STATE_RECORDING)
+            CLEAR_TICK_OUT
         taskENTER_CRITICAL();
         uint8_t tick = sequence[seq_index];
 
