@@ -38,17 +38,17 @@ void sequence_insert(uint8_t tick, uint8_t *effected_tick, uint8_t effected_posi
 }
 
 // periodically updates outputs with the sequence's current tick
+// when not in recording state, reset sequencer to defaults
 void tick_write_task(void *pvparameters) {
     for(;;) {
-        if(state != STATE_RECORDING)
-            CLEAR_TICK_OUT
-        taskENTER_CRITICAL();
-        uint8_t tick = sequence[seq_index];
+            taskENTER_CRITICAL();
+            uint8_t tick = sequence[seq_index];
 
-        if(SEQ_ON_HIGH_TICK)
-            tick = tick >> 4;
-        WRITE_TICK_OUT(tick);
-        taskEXIT_CRITICAL();
+            if(SEQ_ON_HIGH_TICK)
+                tick = tick >> 4;
+            WRITE_TICK_OUT(tick);
+            taskEXIT_CRITICAL();
+
         vTaskDelay(pdMS_TO_TICKS(TICK_WRITE_PERIOD_MS));
     }
 }
@@ -66,4 +66,15 @@ ISR(TIMER1_COMPA_vect) {
         //      seq_index = seq_position/2
         CLEAR_TICK_OUT
     }
+}
+
+void exit_recording_state() {
+    SEQUENCER_STOP
+    CLEAR_TICK_OUT
+}
+
+void enter_recording_state() {
+    seq_position = 0;
+    seq_index = 0;
+    SEQUENCER_START
 }

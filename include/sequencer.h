@@ -25,5 +25,7 @@ extern TaskHandle_t tick_write_handle;
 
 void sequence_insert(uint8_t tick, uint8_t *effected_tick, uint8_t effected_position);
 void tick_write_task(void *pvparameters);
+void exit_recording_state();
+void enter_recording_state();
 
 #endif

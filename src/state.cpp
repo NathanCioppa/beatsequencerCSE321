@@ -22,13 +22,24 @@ void set_state(uint8_t new_state) {
 
 void change_state_task(void *pvparameters) {
   for(;;) {
+    exit_recording_state();
+
     state = ((state+1) | (1<<STATE_TRANSITION_BIT)) & STATE_MASK;
     STATE_PORT = state << STATE_BIT_0;
   
     vTaskDelay(pdMS_TO_TICKS(STATE_TRANSITION_MS));
     state &= ~(1<<STATE_TRANSITION_BIT);
     STATE_PORT = state << STATE_BIT_0;
-    CLEAR_STATE_CHANGE_INTERRUPT_PENDING // acts as a debounce
+    switch(state) {
+      case STATE_RECORDING: enter_recording_state();
+        break;
+      case STATE_LOAD: ;
+        break;
+      case STATE_STORE: ;
+       break;
+      case STATE_TEMPO: ;
+       break;
+    }
     vTaskSuspend(change_state_handle); // suspend self
   }
 }
