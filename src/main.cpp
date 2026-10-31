@@ -7,6 +7,7 @@
 #include <Arduino.h>
 #include "poll_inputs_task.h"
 #include "state.h"
+#include "tempo.h"
 
 void setup() {
   // allow pins to act as interrupts, ATMega datasheet 7.3.1
@@ -16,7 +17,7 @@ void setup() {
   DDRB |= (1<<PB1); // PortB Pin1 is the output for Timer1, must be in output mode. ATMega datasheet 14.3.1
   TCCR1A = (1<<COM1A0); // set to Toggle on Compare Match (toggle output pin on each counter reset). ATMega datasheet 16.11.1
   TCCR1B = (1<<WGM12)|(1<<CS11)|(1<<CS10); // set to CTC Mode, with prescalar 64. ATMega datasheet 16.11.2
-  OCR1A = BPM_TO_OCR1A(DEFAULT_BPM); // initialize clock to DEFAULT_BPM. 
+  SET_TEMPO_CLK_BPM(DEFAULT_BPM) // initialize clock to DEFAULT_BPM. 
 
   // setup D2 as risng-edge interrupt trigger (to trigger state change)
   DDRD &= ~(1<<PD2); // PortD Pin2 is the input for INT0, ATMega datasheet 14.3.3 table 14-9

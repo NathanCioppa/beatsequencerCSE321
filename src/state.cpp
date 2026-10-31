@@ -37,8 +37,6 @@ void change_state_task(void *pvparameters) {
         break;
       case STATE_STORE: ;
        break;
-      case STATE_TEMPO: ;
-       break;
     }
     vTaskSuspend(change_state_handle); // suspend self
   }

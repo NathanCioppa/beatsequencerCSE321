@@ -7,6 +7,12 @@
 #include <Arduino.h>
 #include "sequencer.h"
 #include "state.h"
+#include "tempo.h"
+
+#define IN_A (1<<0)
+#define IN_B (1<<1)
+#define IN_C (1<<2)
+#define IN_D (1<<3)
 
 void handle_inputs_recording(uint8_t inputs, uint8_t *effected_tick, uint8_t effected_position);
 void handle_inputs_load(uint8_t inputs);
@@ -17,6 +23,7 @@ void poll_inputs_task(void *pvParams) {
   uint8_t prev = 0;
   uint8_t read = 0;
   uint8_t highedge = 0;
+  
   for(;;) {
     read = READ_INPUTS;
     taskENTER_CRITICAL();
@@ -57,4 +64,14 @@ void handle_inputs_store(uint8_t inputs) {
 }
 
 void handle_inputs_tempo(uint8_t inputs) {
+  uint16_t inc_amount = 0;
+    if(inputs & IN_A)
+        inc_amount += 1;
+    if(inputs & IN_B)
+        inc_amount += 10;
+    if(inputs & IN_C)
+        inc_amount += 100;
+    if(inputs & IN_D)
+        inc_amount += MAX_BPM-MIN_BPM; 
+  increment_tempo(inc_amount);
 }
