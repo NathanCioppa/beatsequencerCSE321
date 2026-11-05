@@ -16,8 +16,6 @@
 
 #define SET_TEMPO_CLK_BPM(x) OCR1A = BPM_TO_OCR1A(x);
 
-void enter_tempo_state();
-void exit_tempo_state();
 void increment_tempo(uint16_t amount);
 
 extern uint16_t tempo; // in BPM

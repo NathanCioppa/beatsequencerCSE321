@@ -2,6 +2,7 @@
 #define BEAT_SEQUENCER_H
 
 #include "sequencer.h"
+#include <LiquidCrystal_I2C.h>
 
 #define CPU_CLK_HZ 16000000
 
@@ -10,5 +11,7 @@
 #define POLL_PERIOD_MS 10 
 
 #define READ_INPUTS (PINC & 0xF)
+
+extern LiquidCrystal_I2C lcd;
 
 #endif

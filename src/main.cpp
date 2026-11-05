@@ -8,6 +8,9 @@
 #include "poll_inputs_task.h"
 #include "state.h"
 #include "tempo.h"
+#include <Wire.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void setup() {
   // allow pins to act as interrupts, ATMega datasheet 7.3.1
@@ -28,7 +31,7 @@ void setup() {
   DDRD |= (1<<PD4)|(1<<PD5)|(1<<PD6)|(1<<PD7); // set PortD pins 4-7 as output, for sequence output.
   DDRB |= (1<<PB2)|(1<<PB3)|(1<<PB4); // set PortB pins 2-4 as output, for state tracking.
 
-  xTaskCreate(poll_inputs_task, "poll", 100, NULL, 1, NULL);
+  xTaskCreate(poll_inputs_task, "poll", 300, NULL, 1, NULL);
   xTaskCreate(tick_write_task, "tikw", 100, NULL, 1, &tick_write_handle);
   xTaskCreate(change_state_task, "state", 100, NULL, 5, &change_state_handle);
   vTaskSuspend(change_state_handle);
@@ -37,6 +40,11 @@ void setup() {
 
   Serial.begin(9600);
   Serial.println("start");
+
+  Wire.begin();
+  lcd.init();
+  lcd.backlight();
+  lcd.print(DEFAULT_BPM);
 }
 
 void loop() {

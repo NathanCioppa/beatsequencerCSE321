@@ -64,6 +64,9 @@ void handle_inputs_store(uint8_t inputs) {
 }
 
 void handle_inputs_tempo(uint8_t inputs) {
+  if(!inputs)
+    return;
+  
   uint16_t inc_amount = 0;
     if(inputs & IN_A)
         inc_amount += 1;
