@@ -8,6 +8,7 @@
 #include "sequencer.h"
 #include "state.h"
 #include "tempo.h"
+#include "mem.h"
 
 #define IN_A (1<<0)
 #define IN_B (1<<1)
@@ -58,9 +59,15 @@ void handle_inputs_recording(uint8_t inputs, uint8_t *effected_tick, uint8_t eff
 }
 
 void handle_inputs_load(uint8_t inputs) {
+  if(inputs & IN_D) {
+    load_sequence(0);
+  }
 }
 
 void handle_inputs_store(uint8_t inputs) {
+  if(inputs & IN_D) {
+    store_sequence(0);
+  }
 }
 
 void handle_inputs_tempo(uint8_t inputs) {

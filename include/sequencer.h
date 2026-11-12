@@ -17,6 +17,8 @@
 
 #define TICK_WRITE_PERIOD_MS 10
 
+#define SEQUENCE_LEN 64
+
 extern uint8_t sequence[64];
 extern uint8_t seq_position;
 extern uint8_t seq_index;
