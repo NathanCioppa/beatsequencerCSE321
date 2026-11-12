@@ -87,26 +87,37 @@ void load_sequence(uint16_t loc) {
     if(loc > MAX_MEM_LOC)
         return;
 
+    // Wire library only does communication up to 32 bytes at a time.
+    // Reading from memory will need to be done in 2 requests.
+
     loc = LOC_TO_ADDR(loc);
 
-    Wire.beginTransmission(I2C_MEM_ADDR);
-    Wire.write(loc >> 8);
-    Wire.write(loc);
-    Wire.endTransmission(false);
-    Wire.requestFrom(I2C_MEM_ADDR, SEQUENCE_LEN/2);
+    // Before reading, the target address needs to be written to the memory chip.
+    for(;;) {
+        Wire.beginTransmission(I2C_MEM_ADDR);
+        Wire.write(loc >> 8);
+        Wire.write(loc);
+        Wire.endTransmission(false); // keep connection open to do the read.
+        if(Wire.requestFrom(I2C_MEM_ADDR, SEQUENCE_LEN/2) == 32) // try again if it doesnt get enough data
+            break;
+    }
+    
     for(int i=0; i<32; i++) {
-        seq_buf[i] = Wire.read();
+        seq_buf[i] = Wire.read(); // the requested bytes are gotten from read.
     }
     loc+=32;
-    Wire.beginTransmission(I2C_MEM_ADDR);
-    Wire.write(loc >> 8);
-    Wire.write(loc);
-    Wire.endTransmission(false);
-    Wire.requestFrom(I2C_MEM_ADDR, SEQUENCE_LEN/2);
+    for(;;) {
+        Wire.beginTransmission(I2C_MEM_ADDR);
+        Wire.write(loc >> 8);
+        Wire.write(loc);
+        Wire.endTransmission(false);
+        if(Wire.requestFrom(I2C_MEM_ADDR, SEQUENCE_LEN/2) == 32)
+            break;
+    }
+
     for(int i=32; i<64; i++) {
         seq_buf[i] = Wire.read();
     }
-    Wire.endTransmission();
 
     taskENTER_CRITICAL();
     for(int i=0; i<SEQUENCE_LEN; i++) {
