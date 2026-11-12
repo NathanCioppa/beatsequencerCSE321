@@ -59,15 +59,31 @@ void handle_inputs_recording(uint8_t inputs, uint8_t *effected_tick, uint8_t eff
 }
 
 void handle_inputs_load(uint8_t inputs) {
-  if(inputs & IN_D) {
-    load_sequence(0);
-  }
+  uint16_t inc_amount = 0;
+  if(inputs & IN_A)
+    inc_amount += 1;
+  if(inputs & IN_B)
+    inc_amount += 10;
+  if(inputs & IN_C) // subtract 10
+    inc_amount += MAX_MEM_SEQ-9;
+
+  increment_target_mem_seq(inc_amount);
+  if(inputs & IN_D)
+    load_sequence(target_mem_seq);
 }
 
 void handle_inputs_store(uint8_t inputs) {
-  if(inputs & IN_D) {
-    store_sequence(0);
-  }
+  uint16_t inc_amount = 0;
+  if(inputs & IN_A)
+    inc_amount += 1;
+  if(inputs & IN_B)
+    inc_amount += 10;
+  if(inputs & IN_C) // subtract 10
+    inc_amount += MAX_MEM_SEQ-9;
+
+  increment_target_mem_seq(inc_amount);
+  if(inputs & IN_D)
+    store_sequence(target_mem_seq);
 }
 
 void handle_inputs_tempo(uint8_t inputs) {
@@ -81,7 +97,7 @@ void handle_inputs_tempo(uint8_t inputs) {
         inc_amount += 10;
     if(inputs & IN_C)
         inc_amount += 100;
-    if(inputs & IN_D)
+    if(inputs & IN_D) // subtract 1
         inc_amount += MAX_BPM-MIN_BPM; 
   increment_tempo(inc_amount);
 }

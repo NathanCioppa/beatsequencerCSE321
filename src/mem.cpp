@@ -4,24 +4,37 @@
 #include <Wire.h>
 #include <Arduino_FreeRTOS.h>
 #include "sequencer.h"
+#include "beat_sequencer.h"
 
 #define WRITE_CONTROL 0b10100000
 #define READ_CONTROL 0b10100001
 
 #define I2C_MEM_ADDR 0x50
 
-#define MAX_MEM_LOC 0xFFFF
 #define ADDR_DATA_LEN 2
 #define TRANSMISSION_LEN SEQUENCE_LEN+ADDR_DATA_LEN
 
-#define LOC_TO_ADDR(x) (x << 6)
+#define MEM_SEQ_TO_ADDR(x) (x << 6)
 
 static uint8_t seq_buf[SEQUENCE_LEN];
 static uint8_t transmission[32];
+uint16_t target_mem_seq = 0;
 
-void store_sequence(uint16_t loc) {
-    if(loc > MAX_MEM_LOC)
+void increment_target_mem_seq(uint16_t inc_amount) {
+    if(inc_amount == 0)
         return;
+
+    INCREMENT_TARGET_MEM_SEQ(inc_amount);
+    lcd.clear();
+    lcd.print(target_mem_seq);
+    
+}
+
+void store_sequence(uint16_t mem_seq) {
+    if(mem_seq > MAX_MEM_SEQ)
+        return;
+
+    uint16_t loc = MEM_SEQ_TO_ADDR(mem_seq);
     
     // copy the current sequence into local buffer
     taskENTER_CRITICAL();
@@ -29,8 +42,6 @@ void store_sequence(uint16_t loc) {
         seq_buf[i] = sequence[i];
     taskEXIT_CRITICAL();
     
-    loc = LOC_TO_ADDR(loc); // multiply by 64 to get base byte address
-
     // Wire only buffers 32 bytes at a time.
     // to store 64 bytes, multiple transmissions are needed.
     // each transmission also needs a 2 byte header before the data to set the address.
@@ -83,14 +94,14 @@ void store_sequence(uint16_t loc) {
     // sorry flash memory :(
 }
 
-void load_sequence(uint16_t loc) {
-    if(loc > MAX_MEM_LOC)
+void load_sequence(uint16_t mem_seq) {
+    if(mem_seq > MAX_MEM_SEQ)
         return;
+
+    uint16_t loc = MEM_SEQ_TO_ADDR(mem_seq);
 
     // Wire library only does communication up to 32 bytes at a time.
     // Reading from memory will need to be done in 2 requests.
-
-    loc = LOC_TO_ADDR(loc);
 
     // Before reading, the target address needs to be written to the memory chip.
     for(;;) {

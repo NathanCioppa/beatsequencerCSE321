@@ -3,6 +3,8 @@
 #include "beat_sequencer.h"
 #include <Arduino.h>
 #include <Arduino_FreeRTOS.h>
+#include "mem.h"
+#include "tempo.h"
 
 #define STATE_BIT_0 PB2
 #define STATE_PORT PORTB
@@ -33,10 +35,18 @@ void change_state_task(void *pvparameters) {
     switch(state) {
       case STATE_RECORDING: enter_recording_state();
         break;
-      case STATE_LOAD: ;
+      case STATE_LOAD: 
+        lcd.clear();
+        lcd.print(target_mem_seq);
         break;
-      case STATE_STORE: ;
-       break;
+      case STATE_STORE: 
+        lcd.clear();
+        lcd.print(target_mem_seq);
+        break;
+      case STATE_TEMPO:
+        lcd.clear();
+        lcd.print(tempo);
+        break;
     }
     vTaskSuspend(change_state_handle); // suspend self
   }
